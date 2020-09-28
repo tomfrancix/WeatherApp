@@ -1,0 +1,71 @@
+body {
+    background-color:rgba(230,230,230,1);
+    color:white;
+}
+span.sidenav {
+    color:white;
+    font-size:25pt;
+    padding:10px;
+    margin:0 auto;
+}
+div.row {
+    text-align:center;
+}
+tr:first-child {
+    text-align:right;
+}
+.colorbox {
+    width:15px; height:15px;
+    background-color:grey;
+    margin:10px;
+    margin-right:10px;
+    margin-bottom:0;
+}
+td {
+    text-align: right;
+}
+td div {
+    display:inline-block;
+    
+}
+.hourlyRain {
+    width:7px;
+    float:left;
+    bottom:-50px;
+    background-color:orangered;
+    height:100px;
+    margin-left:1px;
+}
+.rainHour {
+    width:7px;
+    background-color:white;
+    bottom:0;
+}
+#details p {
+    margin:0;
+}
+.ta-c {
+    text-align:center;
+}
+h5, h6 {
+    text-align:left;
+    margin-left:10px;
+}
+section {
+    background-color:white;
+    color:black;
+    box-shadow:10px 10px 10px lightgrey;
+    padding:10px;
+}
+fieldset {
+    border:2px solid lightgrey;
+    margin-top:10px;
+    border-radius:20px;
+    padding-bottom:10px;
+}
+legend {
+    display:inline-block;
+    width:auto;
+    padding:0 10px 0 10px
+    
+}

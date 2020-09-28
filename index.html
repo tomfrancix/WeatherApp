@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Weather App</title>
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap-grid.min.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap/js/bootstrap.min.js">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="margin:0 0;background-color:rgba(0,130,160,1);">
+    <div class="container">
+  <a class="navbar-brand" href="javascript:void(0)">WEATHER APP</a>
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navb">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navb">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="javascript:void(0)">Basic</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="javascript:void(0)">Advanced</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" href="javascript:void(0)">Disabled</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="text" placeholder="Where are you?">
+      <button class="btn btn-success my-2 my-sm-0" type="button">Go!</button>
+    </form>
+  </div>
+  </div>
+</nav>
+<div class="container" style="margin-top:10px;color:white;">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <section class="ta-c">
+                <fieldset>
+                    <legend>Check Your Weather Now</legend>
+                    <button type="button" id="findMe" class="btn btn-info">Show Me</button>
+                    <div id="geoResults" style="padding:15px 10px 0 10px;">
+                        
+                    </div>
+                </fieldset>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6" style="padding:20px;">
+            <section class="ta-c">
+                <div id="results"></div>
+            </section>
+        </div>
+        <div class="col-6" style="padding:20px;">
+            <section class="ta-c">
+                <div id="forecast"></div>
+            </section>
+        </div>
+    </div>
+</div>
+    <script>
+         window.onload = function () {
+            var lat;
+            var long;
+            var findMe = document.getElementById("findMe"); 
+            findMe.onclick = function () {
+                var geoLocator = window.navigator.geolocation;
+                var posOptions = {enableHighAccuracy: true, timeout: 45000};
+                geoLocator.getCurrentPosition(successPosition, errorPosition, posOptions);
+            }
+            function successPosition(pos) {
+                var sp = document.createElement("p");
+                var div = document.createElement("div");
+                sp.innerText = "Latitude: " + pos.coords.latitude + "  |  Longitude: " + pos.coords.longitude;
+                div.innerHTML = "<iframe src='https://maps.google.com/maps?q="+pos.coords.latitude+", "+pos.coords.longitude+"&z=15&output=embed' frameborder='0' style='border:0;width:100%;' aria-hidden='false' tabindex='0'></iframe>"
+                document.getElementById("geoResults").appendChild(sp);
+                document.getElementById("geoResults").appendChild(div);
+                lat=pos.coords.latitude;
+                long=pos.coords.longitude;
+                getData();
+            }
+            function errorPosition(err) {
+                var sp = document.createElement("p");
+                sp.innerText = "error: " + err.message + "code: " + err.code;
+                document.getElementById("geoResults").appendChild(sp);
+            }
+            function getTime(timestamp) {
+                
+                // Create a new JavaScript Date object based on the timestamp
+                // multiplied by 1000 so that the argument is in milliseconds, not seconds.
+                var date = new Date(timestamp * 1000);
+                // Hours part from the timestamp
+                var hours = date.getHours();
+                // Minutes part from the timestamp
+                var minutes = "0" + date.getMinutes();
+                // Seconds part from the timestamp
+                var seconds = "0" + date.getSeconds();
+
+                // Will display time in 10:30:23 format
+                var formattedTime = hours + ":" + minutes.substr(-2) + ":" + seconds.substr(-2);
+
+                return formattedTime;
+             }
+            function getData() {
+                var request = new XMLHttpRequest();
+                var str = "https://api.openweathermap.org/data/2.5/onecall?lat="+lat+"&lon="+long+"&units=metric&appid=2b07cd8714df68f3577de26d2b4cee8d";
+                request.open("GET", str, false);
+                request.send(null);
+                //Convert string to JSON object
+                var data = JSON.parse(request.response);
+                //Get the div for displaying results
+                var results = document.getElementById("results");
+                //create and append the fieldset element
+                results.appendChild(document.createElement("fieldset"));
+                //Give the fieldset an ID attribute
+                results.firstChild.setAttribute("id", "info");
+                //Save the reference selector for the fieldset
+                var info = document.getElementById("info");
+                //Create and append a legend for the fieldset
+                info.appendChild(document.createElement("legend"));
+                //Display the location in the legend.
+                info.firstChild.innerText = data.timezone;
+                //Create and append a div to the fieldset
+                info.appendChild(document.createElement("div"));
+                //Give the new div an ID attribute
+                info.firstChild.nextSibling.setAttribute("id", "details");
+                //Sava the reference selector for the new div
+                var details = document.getElementById("details");
+                //Add a container, a row, and two columns to this div
+                details.innerHTML = "<div class='container'><div class='row'><div class='col-6' id='dleft'></div><div class='col-6' id='dright' style='text-align:left;'></div></div></div>";
+                //Add general description and icon
+                var dleft = document.getElementById("dleft");
+                dleft.innerHTML = "<div style='width:100%;'><img src='../Images/"+data.current.weather[0].icon+".png'/></div>";
+                dleft.appendChild(document.createElement("p"));
+                dleft.firstChild.nextSibling.innerText = data.current.weather[0].description;
+                var windspeed = ((data.current.wind_speed)/1000)*60;
+                dleft.innerHTML += "<hr><p><b>Avg. Wind Speed: </b>"+windspeed+" km/h</p><p><b>Wind Direction: </b></p><div style='width:150px;height:170px;text-align:center;'class='container-fluid'><div style='width:100%;height:20px;'><b>N</b></div><div style='height:120px;width:120px;border-radius:50%;border:2px solid grey;margin-top:5px;padding:35px 30px 30px 30px;'><i style='font-size:30pt;transform:rotate("+parseInt(data.current.wind_deg)+"deg);' class='fa fa-arrow-up'></i></div> <div style='width:100%;'><b>S</b></div></div>";
+                //Add details
+                var dright = document.getElementById("dright");
+                var sunrise = getTime(data.current.sunrise.toString());
+                var sunset = getTime(data.current.sunset.toString());
+                dright.innerHTML = "<p><i class='fa fa-sun-o' style='color:yellow;'></i> <b>Sunrise: </b>"+sunrise+"</p><p><i class='fa fa-sun-o' style='color:orange;'></i> <b>Sunset: </b>"+sunset+"</p><p><i class='fa fa-thermometer-half'></i> <b>Temperature: </b>"+data.current.temp+" &#176 C</p><p><b>Feels like: </b>"+data.current.feels_like+" &#176 C</p><p><i class='fa fa-hand-holding-water' ></i> <b>Humidity: </b>"+data.current.humidity+"%</p><p><i class='fa fa-cloud'></i> <b>Cloudiness: </b>"+data.current.clouds+"%</p><br>";
+                
+                //Create new field for forecast
+                var forecast = document.getElementById("forecast");
+                forecast.appendChild(document.createElement("fieldset"));
+                forecast.firstChild.appendChild(document.createElement("legend"));
+                forecast.firstChild.firstChild.innerText = "24 Hour Forecast";
+                forecast.firstChild.appendChild(document.createElement("div"));
+                var att = document.createAttribute("id");
+                att.value = "forecastData";
+                forecast.firstChild.lastChild.setAttributeNode(att);
+                var forecastData = document.getElementById("forecastData");
+                var avgTemp;
+                console.log(data.hourly[0].temp);
+//                var allTemps = [];
+//                
+//                for(var i = 0; i<data.hourly.length; i++) {
+//                    avgTemp += data.hourly[i].temp;
+//                    allTemps.push(data.hourly[i].temp);
+//                }
+//                avgTemp = avgTemp/data.hourly.length;
+                forecastData.innerHTML = "<h6>Temperature (&#176 C)</h6>";
+                forecastData.innerHTML += "<div id='hourlyTemp' style='height:100px;width:400px;margin:0 auto;border-left:1px solid black;border-bottom:1px solid black;'></div><div id='times' style='width:400px;margin:0 auto;height:10px;font-size:10pt;padding-left:5px;'></div>";
+                var hourlyTemp = document.getElementById("hourlyTemp");
+                var hourlyTimes = document.getElementById("times");
+                for(var i = 0; i<51; i++) {
+//                    var height = (50/avgTemp)*data.hourly[i].temp;
+                    hourlyTemp.innerHTML += "<div class='hourlyRain' style='height:100px;'><div class='rainHour' style='height:"+(60-data.hourly[i].temp)+"px;'></div></div>"
+                   if (i%2 == 0 && i != 0) {
+                       hourlyTimes.innerHTML += "<div class='hourlyRain' style='height:10px;background-color:white;width:15px;font-size:6pt;'>"+i+"</div>";
+                   }
+                }
+                
+                
+            }
+            
+                
+                
+            
+        }
+    </script>
+</body>
+</html>
